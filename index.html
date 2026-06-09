@@ -5,71 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>에너지 가디언즈 AR 도감</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     
     <style>
-        /* 화면 상단 기본 안내 가이드 */
         #guide-msg {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.95); padding: 10px 20px; border-radius: 25px;
-            font-size: 14px; font-weight: bold; z-index: 9999; border: 2px solid #2a75bb;
-            box-shadow: 0px 3px 6px rgba(0,0,0,0.16); font-family: sans-serif;
+            font-size: 14px; font-weight: bold; z-index: 9999; border: 2px solid #2a75bb; font-family: sans-serif;
         }
-        
-        /* 카드 매칭 인포메이션 팝업 스크린 */
         #ui-container {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
             width: 88%; max-width: 440px; background: rgba(15, 15, 15, 0.94); color: white;
             padding: 18px; border-radius: 16px; font-family: sans-serif;
             z-index: 9999; display: none; box-shadow: 0px 5px 20px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.15);
         }
-        
-        #ui-title { 
-            font-size: 19px; font-weight: bold; margin-bottom: 12px; 
-            color: #ffcb05; text-align: center; text-shadow: 1px 1px 2px #000;
-        }
-        
-        /* 인식된 포켓몬 카드와 발전소 사진을 1:1 비율로 배치 */
-        .img-flex-box {
-            display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px;
-        }
-        .ui-preview-img {
-            width: 48%; height: 125px; object-fit: contain; 
-            border-radius: 8px; background: #222; border: 1.5px solid rgba(255,255,255,0.3);
-        }
-
-        #ui-desc { 
-            font-size: 13.5px; line-height: 1.55; margin-bottom: 14px; 
-            text-align: justify; color: #f0f0f0; word-break: keep-all;
-        }
-        
-        #info-btn {
-            background: linear-gradient(135deg, #2a75bb, #3b82f6); border: none; 
-            color: white; padding: 10px 0; border-radius: 25px; cursor: pointer; 
-            font-weight: bold; width: 100%; font-size: 14px; transition: 0.2s;
-        }
-        #info-btn:active { opacity: 0.8; }
+        #ui-title { font-size: 19px; font-weight: bold; margin-bottom: 12px; color: #ffcb05; text-align: center; }
+        .img-flex-box { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+        .ui-preview-img { width: 48%; height: 125px; object-fit: contain; border-radius: 8px; background: #222; border: 1.5px solid rgba(255,255,255,0.3); }
+        #ui-desc { font-size: 13.5px; line-height: 1.55; margin-bottom: 14px; text-align: justify; color: #f0f0f0; }
+        #info-btn { background: linear-gradient(135deg, #2a75bb, #3b82f6); border: none; color: white; padding: 10px 0; border-radius: 25px; width: 100%; font-weight: bold; }
     </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-    <div id="guide-msg">준비한 포켓몬 카드를 카메라로 비춰주세요!</div>
+    <div id="guide-msg">화면에 테스트 마커를 비춰주세요!</div>
 
     <div id="ui-container">
         <div id="ui-title">발전소 분석 데이터</div>
-        
         <div class="img-flex-box">
-            <img id="pop-pokemon-img" class="ui-preview-img" src="" alt="인식된 카드">
-            <img id="pop-factory-img" class="ui-preview-img" src="" alt="연계 발전소">
+            <img id="pop-pokemon-img" class="ui-preview-img" src="">
+            <img id="pop-factory-img" class="ui-preview-img" src="">
         </div>
-
-        <div id="ui-desc">에너지 데이터 로딩 중...</div>
+        <div id="ui-desc">데이터 로딩 중...</div>
         <button id="info-btn" onclick="alert('⚡ 친환경 에너지 도감 등록 완료!')">학습 완료</button>
     </div>
 
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-        
         <a-assets>
             <img id="pidgeot-card" src="./pidgeot.png">
             <img id="wind-photo" src="./wind.png">
@@ -79,23 +50,14 @@
             <img id="hydro-photo" src="./hydro.png">
         </a-assets>
 
-        <a-nft type="nft" url="./pidgeot" id="marker-pidgeot">
-            <a-entity position="0 0 0" scale="1 1 1"></a-entity>
-        </a-nft>
-
-        <a-nft type="nft" url="./charmander" id="marker-charmander">
-            <a-entity position="0 0 0" scale="1 1 1"></a-entity>
-        </a-nft>
-
-        <a-nft type="nft" url="./squirtle" id="marker-squirtle">
-            <a-entity position="0 0 0" scale="1 1 1"></a-entity>
-        </a-nft>
+        <a-marker preset="hiro" id="marker-pidgeot"></a-marker>
+        <a-marker preset="kanji" id="marker-charmander"></a-marker>
+        <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/patt.a" id="marker-squirtle"></a-marker>
 
         <a-entity camera></a-entity>
     </a-scene>
 
     <script>
-        // 전역 DOM 변수 제어
         const uiContainer = document.querySelector('#ui-container');
         const uiTitle = document.querySelector('#ui-title');
         const uiDesc = document.querySelector('#ui-desc');
@@ -107,41 +69,28 @@
         const mCharmander = document.querySelector('#marker-charmander');
         const mSquirtle = document.querySelector('#marker-squirtle');
 
-        // [인터랙션 1] 피죤투 카드 검출 -> 풍력 발전소 연결
         mPidgeot.addEventListener('markerFound', () => {
-            guideMsg.style.display = 'none';
-            uiContainer.style.display = 'block';
+            guideMsg.style.display = 'none'; uiContainer.style.display = 'block';
             uiTitle.innerText = "🍃 피죤투 × 영덕 풍력 발전소";
-            uiDesc.innerText = "거센 바람을 자유자재로 다루는 피죤투의 특성처럼, 풍력 발전소는 자연적인 대기의 흐름인 바람을 이용하여 대형 블레이드(날개)를 회전시키고, 이를 통해 발생하는 기계적 회전 에너지를 친환경 무공해 전기에너지로 변환하는 천연 미래 발전 방식입니다.";
-            popPokemonImg.src = "./pidgeot.png";
-            popFactoryImg.src = "./wind.png";
+            uiDesc.innerText = "거센 바람을 자유자재로 다루는 피죤투의 특성처럼, 풍력 발전소는 자연적인 바람의 흐름을 이용하여 대형 날개를 회전시키고 청정 전기에너지로 변환합니다.";
+            popPokemonImg.src = "./pidgeot.png"; popFactoryImg.src = "./wind.png";
         });
 
-        // [인터랙션 2] 파이리 카드 검출 -> 화력 발전소 연결
         mCharmander.addEventListener('markerFound', () => {
-            guideMsg.style.display = 'none';
-            uiContainer.style.display = 'block';
+            guideMsg.style.display = 'none'; uiContainer.style.display = 'block';
             uiTitle.innerText = "🔥 파이리 × 당진 화력 발전소";
-            uiDesc.innerText = "파이리의 강력한 불꽃 열에너지처럼, 화력 발전소는 석탄이나 LNG 등의 화석 연료를 연소할 때 발생하는 고온의 열로 물을 끓여 고압의 증기를 만들어냅니다. 그리고 이 증기의 팽창하는 힘으로 터빈을 돌려 전력을 생산합니다.";
-            popPokemonImg.src = "./charmander.png";
-            popFactoryImg.src = "./thermal.png";
+            uiDesc.innerText = "파이리의 강력한 불꽃 열에너지처럼, 화력 발전소는 연료를 연소할 때 발생하는 고온의 열로 물을 끓여 고압의 증기를 만들고 터빈을 돌려 전력을 생산합니다.";
+            popPokemonImg.src = "./charmander.png"; popFactoryImg.src = "./thermal.png";
         });
 
-        // [인터랙션 3] 꼬부기 카드 검출 -> 소양강 수력 발전소 연결
         mSquirtle.addEventListener('markerFound', () => {
-            guideMsg.style.display = 'none';
-            uiContainer.style.display = 'block';
+            guideMsg.style.display = 'none'; uiContainer.style.display = 'block';
             uiTitle.innerText = "💧 꼬부기 × 소양강 수력 발전소";
-            uiDesc.innerText = "입에서 강력한 물줄기를 발사하는 꼬부기의 특성처럼, 수력 발전소는 높은 위치의 댐에 저장해 둔 낙차 큰 물이 아래로 쏟아질 때 발생하는 강력한 위치 에너지를 이용합니다. 떨어지는 물의 힘으로 수차를 급속 회전시켜 무공해 전기를 얻어냅니다.";
-            popPokemonImg.src = "./squirtle.png";
-            popFactoryImg.src = "./hydro.png";
+            uiDesc.innerText = "강력한 물줄기를 발사하는 꼬부기처럼, 수력 발전소는 높은 곳에서 쏟아지는 물의 강력한 위치 에너지를 이용하여 수차 터빈을 회전시켜 전기를 생산합니다.";
+            popPokemonImg.src = "./squirtle.png"; popFactoryImg.src = "./hydro.png";
         });
 
-        // 추적 손실(카메라가 카드를 놓쳤을 때) 이벤트 핸들러
-        const resetToGuide = () => {
-            uiContainer.style.display = 'none';
-            guideMsg.style.display = 'block';
-        };
+        const resetToGuide = () => { uiContainer.style.display = 'none'; guideMsg.style.display = 'block'; };
         mPidgeot.addEventListener('markerLost', resetToGuide);
         mCharmander.addEventListener('markerLost', resetToGuide);
         mSquirtle.addEventListener('markerLost', resetToGuide);
