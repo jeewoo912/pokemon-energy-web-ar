@@ -23,7 +23,14 @@
         .img-flex-box { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
         .ui-preview-img { width: 48%; height: 125px; object-fit: contain; border-radius: 8px; background: #222; border: 1.5px solid rgba(255,255,255,0.3); }
         #ui-desc { font-size: 13.5px; line-height: 1.55; margin-bottom: 14px; text-align: justify; color: #f0f0f0; }
-        #info-btn { background: linear-gradient(135deg, #2a75bb, #3b82f6); border: none; color: white; padding: 10px 0; border-radius: 25px; width: 100%; font-weight: bold; }
+        
+        /* 학습 완료 버튼 디자인 */
+        #info-btn { 
+            background: linear-gradient(135deg, #2a75bb, #3b82f6); border: none; 
+            color: white; padding: 12px 0; border-radius: 25px; width: 100%; 
+            font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.2s;
+        }
+        #info-btn:active { opacity: 0.7; }
     </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
@@ -37,7 +44,7 @@
             <img id="pop-factory-img" class="ui-preview-img" src="">
         </div>
         <div id="ui-desc">데이터 로딩 중...</div>
-        <button id="info-btn" onclick="alert('⚡ 친환경 에너지 도감 등록 완료!')">학습 완료</button>
+        <button id="info-btn" onclick="closeUI()">⚡ 도감 등록 및 완료</button>
     </div>
 
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
@@ -71,6 +78,7 @@
         const mCharmander = document.querySelector('#marker-charmander');
         const mSquirtle = document.querySelector('#marker-squirtle');
 
+        // [인터랙션 1] 피죤투 스캔
         mPidgeot.addEventListener('markerFound', () => {
             guideMsg.style.display = 'none'; uiContainer.style.display = 'block';
             uiTitle.innerText = "🍃 피죤투 × 영덕 풍력 발전소";
@@ -78,6 +86,7 @@
             popPokemonImg.src = "./pidgeot.png"; popFactoryImg.src = "./wind.png";
         });
 
+        // [인터랙션 2] 파이리 스캔
         mCharmander.addEventListener('markerFound', () => {
             guideMsg.style.display = 'none'; uiContainer.style.display = 'block';
             uiTitle.innerText = "🔥 파이리 × 당진 화력 발전소";
@@ -85,17 +94,29 @@
             popPokemonImg.src = "./charmander.png"; popFactoryImg.src = "./thermal.png";
         });
 
+        // [인터랙션 3] 꼬부기 스캔
         mSquirtle.addEventListener('markerFound', () => {
             guideMsg.style.display = 'none'; uiContainer.style.display = 'block';
             uiTitle.innerText = "💧 꼬부기 × 소양강 수력 발전소";
-            uiDesc.innerText = "강력한 물줄기를 발사하는 꼬부기처럼, 수력 발전소는 높은 곳에서 쏟아지는 물의 강력한 위치 에너지를 이용하여 수차 터빈을 회전시켜 전기를 생산합니다.";
+            uiDesc.innerText = "강력한 물줄기를 발사하는 꼬부기처럼, 수력 발전소는 높은 곳에서 쏟아지는 물의 강력한 위치 에너지를 이용하여 수차 터빈을 회전시키고 전기를 생산합니다.";
             popPokemonImg.src = "./squirtle.png"; popFactoryImg.src = "./hydro.png";
         });
 
+        // 마커를 놓쳤을 때 초기화
         const resetToGuide = () => { uiContainer.style.display = 'none'; guideMsg.style.display = 'block'; };
         mPidgeot.addEventListener('markerLost', resetToGuide);
         mCharmander.addEventListener('markerLost', resetToGuide);
         mSquirtle.addEventListener('markerLost', resetToGuide);
+
+        // 🛠️ [신규 함수] 학습 완료 버튼 누르면 실행되는 기능
+        function closeUI() {
+            // 1. 팝업창을 화면에서 숨깁니다.
+            uiContainer.style.display = 'none';
+            // 2. 상단 안내 메시지를 다시 띄웁니다.
+            guideMsg.style.display = 'block';
+            // 3. 버튼 글자를 동적으로 바꾸어 등록되었다는 피드백을 은근히 줍니다.
+            document.querySelector('#info-btn').innerText = "⚡ 도감 등록 완료!";
+        }
     </script>
 </body>
 </html>
