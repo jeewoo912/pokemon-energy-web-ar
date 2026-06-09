@@ -12,6 +12,7 @@
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.95); padding: 10px 20px; border-radius: 25px;
             font-size: 14px; font-weight: bold; z-index: 9999; border: 2px solid #2a75bb; font-family: sans-serif;
+            text-align: center; word-break: keep-all;
         }
         #ui-container {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
@@ -24,7 +25,6 @@
         .ui-preview-img { width: 48%; height: 125px; object-fit: contain; border-radius: 8px; background: #222; border: 1.5px solid rgba(255,255,255,0.3); }
         #ui-desc { font-size: 13.5px; line-height: 1.55; margin-bottom: 14px; text-align: justify; color: #f0f0f0; }
         
-        /* 학습 완료 버튼 디자인 */
         #info-btn { 
             background: linear-gradient(135deg, #2a75bb, #3b82f6); border: none; 
             color: white; padding: 12px 0; border-radius: 25px; width: 100%; 
@@ -57,7 +57,7 @@
             <img id="hydro-photo" src="./hydro.png">
         </a-assets>
 
-        <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/patt.hiro" id="marker-pidgeot"></a-marker>
+        <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/patt.b" id="marker-pidgeot"></a-marker>
         
         <a-marker preset="kanji" id="marker-charmander"></a-marker>
         
@@ -78,44 +78,46 @@
         const mCharmander = document.querySelector('#marker-charmander');
         const mSquirtle = document.querySelector('#marker-squirtle');
 
-        // [인터랙션 1] 피죤투 스캔
-        mPidgeot.addEventListener('markerFound', () => {
-            guideMsg.style.display = 'none'; uiContainer.style.display = 'block';
-            uiTitle.innerText = "🍃 피죤투 × 영덕 풍력 발전소";
-            uiDesc.innerText = "거센 바람을 자유자재로 다루는 피죤투의 특성처럼, 풍력 발전소는 자연적인 바람의 흐름을 이용하여 대형 날개를 회전시키고 청정 전기에너지로 변환합니다.";
-            popPokemonImg.src = "./pidgeot.png"; popFactoryImg.src = "./wind.png";
-        });
+        // 🛠️ 멈춤 방지용 쿨다운 시스템 추가
+        let isCooldown = false;
 
-        // [인터랙션 2] 파이리 스캔
-        mCharmander.addEventListener('markerFound', () => {
-            guideMsg.style.display = 'none'; uiContainer.style.display = 'block';
-            uiTitle.innerText = "🔥 파이리 × 당진 화력 발전소";
-            uiDesc.innerText = "파이리의 강력한 불꽃 열에너지처럼, 화력 발전소는 연료를 연소할 때 발생하는 고온의 열로 물을 끓여 고압의 증기를 만들고 터빈을 돌려 전력을 생산합니다.";
-            popPokemonImg.src = "./charmander.png"; popFactoryImg.src = "./thermal.png";
-        });
+        function showPopup(title, desc, pokeImg, factImg) {
+            if (isCooldown) return; // 학습 완료 직후이거나 이미 떠있으면 무시 (무한루프 방지)
+            guideMsg.style.display = 'none';
+            uiContainer.style.display = 'block';
+            uiTitle.innerText = title;
+            uiDesc.innerText = desc;
+            popPokemonImg.src = pokeImg;
+            popFactoryImg.src = factImg;
+        }
 
-        // [인터랙션 3] 꼬부기 스캔
-        mSquirtle.addEventListener('markerFound', () => {
-            guideMsg.style.display = 'none'; uiContainer.style.display = 'block';
-            uiTitle.innerText = "💧 꼬부기 × 소양강 수력 발전소";
-            uiDesc.innerText = "강력한 물줄기를 발사하는 꼬부기처럼, 수력 발전소는 높은 곳에서 쏟아지는 물의 강력한 위치 에너지를 이용하여 수차 터빈을 회전시키고 전기를 생산합니다.";
-            popPokemonImg.src = "./squirtle.png"; popFactoryImg.src = "./hydro.png";
-        });
+        mPidgeot.addEventListener('markerFound', () => showPopup("🍃 피죤투 × 영덕 풍력 발전소", "거센 바람을 자유자재로 다루는 피죤투의 특성처럼, 풍력 발전소는 자연적인 바람의 흐름을 이용하여 대형 날개를 회전시키고 청정 전기에너지로 변환합니다.", "./pidgeot.png", "./wind.png"));
+        mCharmander.addEventListener('markerFound', () => showPopup("🔥 파이리 × 당진 화력 발전소", "파이리의 강력한 불꽃 열에너지처럼, 화력 발전소는 연료를 연소할 때 발생하는 고온의 열로 물을 끓여 고압의 증기를 만들고 터빈을 돌려 전력을 생산합니다.", "./charmander.png", "./thermal.png"));
+        mSquirtle.addEventListener('markerFound', () => showPopup("💧 꼬부기 × 소양강 수력 발전소", "강력한 물줄기를 발사하는 꼬부기처럼, 수력 발전소는 높은 곳에서 쏟아지는 물의 강력한 위치 에너지를 이용하여 수차 터빈을 회전시켜 전기를 생산합니다.", "./squirtle.png", "./hydro.png"));
 
-        // 마커를 놓쳤을 때 초기화
-        const resetToGuide = () => { uiContainer.style.display = 'none'; guideMsg.style.display = 'block'; };
+        const resetToGuide = () => {
+            if (isCooldown) return;
+            uiContainer.style.display = 'none';
+            guideMsg.style.display = 'block';
+        };
+
         mPidgeot.addEventListener('markerLost', resetToGuide);
         mCharmander.addEventListener('markerLost', resetToGuide);
         mSquirtle.addEventListener('markerLost', resetToGuide);
 
-        // 🛠️ [신규 함수] 학습 완료 버튼 누르면 실행되는 기능
+        // 🛠️ 학습 완료 버튼: 창을 부드럽게 닫고 버그를 방지하는 기능
         function closeUI() {
-            // 1. 팝업창을 화면에서 숨깁니다.
             uiContainer.style.display = 'none';
-            // 2. 상단 안내 메시지를 다시 띄웁니다.
             guideMsg.style.display = 'block';
-            // 3. 버튼 글자를 동적으로 바꾸어 등록되었다는 피드백을 은근히 줍니다.
-            document.querySelector('#info-btn').innerText = "⚡ 도감 등록 완료!";
+            guideMsg.innerHTML = "✨ 도감 등록 성공!<br>(카메라를 다른 곳으로 돌려주세요)";
+            
+            isCooldown = true; // 버튼 누르면 3초간 AR 인식 시스템 일시정지 (화면 멈춤 완전 해결)
+
+            // 3초 뒤에 다시 인식할 수 있도록 정상화
+            setTimeout(() => {
+                isCooldown = false;
+                guideMsg.innerText = "화면에 다음 테스트 마커를 비춰주세요!";
+            }, 3000);
         }
     </script>
 </body>
