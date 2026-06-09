@@ -54,11 +54,22 @@
             50% { transform: scale(1.02); }
             100% { transform: scale(1); }
         }
+
+        /* 브라우저 정지를 막기 위해 새로 만든 커스텀 알림창(토스트) */
+        #toast-msg {
+            position: fixed; top: 20%; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85); color: white; padding: 12px 24px;
+            border-radius: 30px; font-weight: bold; font-size: 14px; z-index: 999999;
+            font-family: sans-serif; display: none; border: 1.5px solid #ffcb05;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center;
+        }
     </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
     <div id="guide-msg">Hiro(꼬부기) 또는 Kanji(파이리) 마커를 카메라에 비춰주세요!</div>
+    
+    <div id="toast-msg"></div>
 
     <div id="ui-container">
         <div id="all-done-box">🎉 [종합 에너지 도감] 모든 학습 완료! 스크린샷을 찍으세요! 🎉</div>
@@ -78,10 +89,11 @@
         const contentArea = document.querySelector('#dynamic-content-area');
         const actionBtn = document.querySelector('#action-btn');
         const allDoneBox = document.querySelector('#all-done-box');
+        const toastMsg = document.querySelector('#toast-msg');
 
         let currentActive = null; 
         let statusCheck = { squirtle: false, charmander: false };
-        let isAllCompleted = false; // 오직 두 마리 다 완료되었을 때만 true가 되는 플래그
+        let isAllCompleted = false; 
 
         const cardsHTML = {
             squirtle: `
@@ -106,9 +118,18 @@
             `
         };
 
+        // 토스트 알림을 띄우는 함수 (화면 정지 버그 원천 차단)
+        function showToast(text) {
+            toastMsg.innerText = text;
+            toastMsg.style.display = 'block';
+            setTimeout(() => {
+                toastMsg.style.display = 'none';
+            }, 2200); // 2.2초 뒤 자동으로 스르륵 사라짐
+        }
+
         // [마커 1] Hiro 인식 -> 꼬부기
         document.querySelector('#marker-hiro').addEventListener('markerFound', () => {
-            if (isAllCompleted) return; // 두 마리 모두 완료되었다면 화면 고정 상태 유지
+            if (isAllCompleted) return; 
             
             guideMsg.style.display = 'none';
             uiContainer.style.display = 'block';
@@ -119,7 +140,7 @@
 
         // [마커 2] Kanji 인식 -> 파이리
         document.querySelector('#marker-kanji').addEventListener('markerFound', () => {
-            if (isAllCompleted) return; // 두 마리 모두 완료되었다면 화면 고정 상태 유지
+            if (isAllCompleted) return; 
             
             guideMsg.style.display = 'none';
             uiContainer.style.display = 'block';
@@ -128,12 +149,12 @@
             updateButtonState('charmander');
         });
 
-        // 🚨 [핵심 수정] 마커를 치웠을 때 처리 함수
+        // 마커 사라졌을 때 처리 함수
         function handleMarkerLost() {
-            // 두 마리 모두 완료(isAllCompleted가 true) 되었을 때만 화면을 숨기지 않고 "진짜 멈춤(박제)"
+            // 두 마리 모두 완료된 최종 합체 상태일 때만 화면 고정(리턴)
             if (isAllCompleted) return; 
 
-            // 그전에는 꼬부기나 파이리 하나만 완료했더라도 마커 치우면 무조건 즉시 화면 사라짐!
+            // 하나만 완료했거나 아직 완료 안 했을 때는 마커 치우면 칼같이 즉시 화면 사라짐!
             uiContainer.style.display = 'none';
             guideMsg.style.display = 'block';
             currentActive = null;
@@ -158,21 +179,22 @@
             if (!currentActive || statusCheck[currentActive]) return;
 
             statusCheck[currentActive] = true;
-            if (currentActive === 'squirtle') {
-                alert("💧 꼬부기 & 소양강 수력 발전소 학습이 완료되었습니다!");
-            } else if (currentActive === 'charmander') {
-                alert("🔥 파이리 & 당진 화력 발전소 학습이 완료되었습니다!");
-            }
-
-            // 꼬부기와 파이리 '둘 다' 완료했는지 실시간 체크
+            
+            // 꼬부기와 파이리 '둘 다' 완료했는지 체크
             if (statusCheck.squirtle && statusCheck.charmander) {
-                isAllCompleted = true; // 최종 잠금장치 ON!!
+                isAllCompleted = true; // 최종 합체 모드 잠금 ON
                 allDoneBox.style.display = "block";
-                contentArea.innerHTML = cardsHTML.squirtle + cardsHTML.charmander; // 꼬부기 + 파이리 뷰 합체
-                actionBtn.style.display = "none"; // 하단 버튼 숨김
+                contentArea.innerHTML = cardsHTML.squirtle + cardsHTML.charmander; // 위아래 동시 정렬 합체
+                actionBtn.style.display = "none"; 
                 guideMsg.style.display = 'none';
-                alert("🎉 축하합니다! 모든 발전소 에너지 학습을 마쳤습니다. 도감이 통합되며 화면이 고정됩니다.");
+                showToast("🎉 모든 학습 완료! 도감이 통합되며 화면이 고정됩니다.");
             } else {
+                // 아직 한 마리만 했을 때
+                if (currentActive === 'squirtle') {
+                    showToast("💧 꼬부기 & 수력 발전소 학습 완료!");
+                } else if (currentActive === 'charmander') {
+                    showToast("🔥 파이리 & 화력 발전소 학습 완료!");
+                }
                 updateButtonState(currentActive);
             }
         }
