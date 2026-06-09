@@ -81,7 +81,7 @@
 
         let currentActive = null; 
         let statusCheck = { squirtle: false, charmander: false };
-        let isAllCompleted = false; // 두 마리 모두 완료되었는지 체크하는 플래그
+        let isAllCompleted = false; // 오직 두 마리 다 완료되었을 때만 true가 되는 플래그
 
         const cardsHTML = {
             squirtle: `
@@ -108,7 +108,7 @@
 
         // [마커 1] Hiro 인식 -> 꼬부기
         document.querySelector('#marker-hiro').addEventListener('markerFound', () => {
-            if (isAllCompleted) return; // 두 마리 모두 완료된 최종 상태면 마커 인식 차단 (화면 고정)
+            if (isAllCompleted) return; // 두 마리 모두 완료되었다면 화면 고정 상태 유지
             
             guideMsg.style.display = 'none';
             uiContainer.style.display = 'block';
@@ -119,7 +119,7 @@
 
         // [마커 2] Kanji 인식 -> 파이리
         document.querySelector('#marker-kanji').addEventListener('markerFound', () => {
-            if (isAllCompleted) return; // 두 마리 모두 완료된 최종 상태면 마커 인식 차단 (화면 고정)
+            if (isAllCompleted) return; // 두 마리 모두 완료되었다면 화면 고정 상태 유지
             
             guideMsg.style.display = 'none';
             uiContainer.style.display = 'block';
@@ -128,9 +128,12 @@
             updateButtonState('charmander');
         });
 
-        // 마커가 사라졌을 때 처리 함수 (두 마리 모두 완료되기 전까지만 작동)
+        // 🚨 [핵심 수정] 마커를 치웠을 때 처리 함수
         function handleMarkerLost() {
-            if (isAllCompleted) return; // 두 마리 완료 상태면 화면을 숨기지 않고 킵
+            // 두 마리 모두 완료(isAllCompleted가 true) 되었을 때만 화면을 숨기지 않고 "진짜 멈춤(박제)"
+            if (isAllCompleted) return; 
+
+            // 그전에는 꼬부기나 파이리 하나만 완료했더라도 마커 치우면 무조건 즉시 화면 사라짐!
             uiContainer.style.display = 'none';
             guideMsg.style.display = 'block';
             currentActive = null;
@@ -161,12 +164,12 @@
                 alert("🔥 파이리 & 당진 화력 발전소 학습이 완료되었습니다!");
             }
 
-            // 두 마리 모두 완료 검증
+            // 꼬부기와 파이리 '둘 다' 완료했는지 실시간 체크
             if (statusCheck.squirtle && statusCheck.charmander) {
-                isAllCompleted = true; // 최종 잠금 플래그 활성화
+                isAllCompleted = true; // 최종 잠금장치 ON!!
                 allDoneBox.style.display = "block";
-                contentArea.innerHTML = cardsHTML.squirtle + cardsHTML.charmander; // 꼬부기 + 파이리 합체
-                actionBtn.style.display = "none"; // 버튼 숨김
+                contentArea.innerHTML = cardsHTML.squirtle + cardsHTML.charmander; // 꼬부기 + 파이리 뷰 합체
+                actionBtn.style.display = "none"; // 하단 버튼 숨김
                 guideMsg.style.display = 'none';
                 alert("🎉 축하합니다! 모든 발전소 에너지 학습을 마쳤습니다. 도감이 통합되며 화면이 고정됩니다.");
             } else {
