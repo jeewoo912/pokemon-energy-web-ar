@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>에너지 가디언즈 AR 도감</title>
-    <!-- 고성능 이미지 트래킹(NFT) 전용 모듈 로드 -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     
@@ -57,7 +56,6 @@
 
     <div id="guide-msg">준비한 포켓몬 카드를 카메라로 비춰주세요!</div>
 
-    <!-- 하단 데이터 바인딩 팝업 스크린 -->
     <div id="ui-container">
         <div id="ui-title">발전소 분석 데이터</div>
         
@@ -70,10 +68,8 @@
         <button id="info-btn" onclick="alert('⚡ 친환경 에너지 도감 등록 완료!')">학습 완료</button>
     </div>
 
-    <!-- Web-AR 렌더링 세션 설정 -->
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
         
-        <!-- 전달받은 6장의 정적 정밀 로컬 PNG 에셋 바인딩 -->
         <a-assets>
             <img id="pidgeot-card" src="./pidgeot.png">
             <img id="wind-photo" src="./wind.png">
@@ -83,17 +79,14 @@
             <img id="hydro-photo" src="./hydro.png">
         </a-assets>
 
-        <!-- 1. 피죤투 카드 이미지 매칭 알고리즘 정의 -->
         <a-nft type="nft" url="./pidgeot" id="marker-pidgeot">
             <a-entity position="0 0 0" scale="1 1 1"></a-entity>
         </a-nft>
 
-        <!-- 2. 파이리 카드 이미지 매칭 알고리즘 정의 -->
         <a-nft type="nft" url="./charmander" id="marker-charmander">
             <a-entity position="0 0 0" scale="1 1 1"></a-entity>
         </a-nft>
 
-        <!-- 3. 꼬부기 카드 이미지 매칭 알고리즘 정의 -->
         <a-nft type="nft" url="./squirtle" id="marker-squirtle">
             <a-entity position="0 0 0" scale="1 1 1"></a-entity>
         </a-nft>
@@ -114,7 +107,7 @@
         const mCharmander = document.querySelector('#marker-charmander');
         const mSquirtle = document.querySelector('#marker-squirtle');
 
-        // [인터랙션 1] 피죤투 PNG 카드 검출 -> 풍력 발전소 연결
+        // [인터랙션 1] 피죤투 카드 검출 -> 풍력 발전소 연결
         mPidgeot.addEventListener('markerFound', () => {
             guideMsg.style.display = 'none';
             uiContainer.style.display = 'block';
@@ -124,17 +117,17 @@
             popFactoryImg.src = "./wind.png";
         });
 
-        // [인터랙션 2] 파이리 PNG 카드 검출 -> 화력 발전소 연결
+        // [인터랙션 2] 파이리 카드 검출 -> 화력 발전소 연결
         mCharmander.addEventListener('markerFound', () => {
             guideMsg.style.display = 'none';
             uiContainer.style.display = 'block';
             uiTitle.innerText = "🔥 파이리 × 당진 화력 발전소";
-            uiDesc.innerText = "파이리의 꼬리에서 뿜어져 나오는 강력한 불꽃 열에너지처럼, 화력 발전소는 석탄이나 LNG 등의 화석 연료를 연소할 때 발생하는 고온의 열로 물을 끓여 고압의 증기를 만들어냅니다. 그리고 이 증기의 팽창하는 힘으로 터빈을 돌려 전력을 생산합니다.";
+            uiDesc.innerText = "파이리의 강력한 불꽃 열에너지처럼, 화력 발전소는 석탄이나 LNG 등의 화석 연료를 연소할 때 발생하는 고온의 열로 물을 끓여 고압의 증기를 만들어냅니다. 그리고 이 증기의 팽창하는 힘으로 터빈을 돌려 전력을 생산합니다.";
             popPokemonImg.src = "./charmander.png";
             popFactoryImg.src = "./thermal.png";
         });
 
-        // [인터랙션 3] 꼬부기 PNG 카드 검출 -> 소양강 수력 발전소 연결
+        // [인터랙션 3] 꼬부기 카드 검출 -> 소양강 수력 발전소 연결
         mSquirtle.addEventListener('markerFound', () => {
             guideMsg.style.display = 'none';
             uiContainer.style.display = 'block';
