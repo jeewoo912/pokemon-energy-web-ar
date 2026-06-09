@@ -8,17 +8,28 @@
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     
     <style>
+        /* 하단 안내창 디자인 수정: 사진이 들어갈 공간 확보 */
         #ui-container {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; background: rgba(0, 0, 0, 0.85); color: white;
-            padding: 15px; border-radius: 15px; font-family: sans-serif; text-align: center;
-            z-index: 9999; display: none; box-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+            width: 90%; max-width: 420px; background: rgba(0, 0, 0, 0.9); color: white;
+            padding: 15px; border-radius: 15px; font-family: sans-serif;
+            z-index: 9999; display: none; box-shadow: 0px 4px 15px rgba(0,0,0,0.6);
         }
-        #ui-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; color: #ffcb05; }
-        #ui-desc { font-size: 14px; line-height: 1.4; margin-bottom: 10px; }
+        #ui-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #ffcb05; text-align: center; }
+        
+        /* 사진 두 장을 가로로 배치하기 위한 스타일 */
+        .img-flex-box {
+            display: flex; justify-content: space-around; gap: 10px; margin-bottom: 12px;
+        }
+        .ui-preview-img {
+            width: 45%; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid #fff;
+        }
+
+        #ui-desc { font-size: 13.5px; line-height: 1.45; margin-bottom: 12px; text-align: justify; color: #e0e0e0; }
+        .btn-center { text-align: center; }
         #info-btn {
-            background: #2a75bb; border: none; color: white; padding: 8px 16px;
-            border-radius: 20px; cursor: pointer; font-weight: bold;
+            background: #2a75bb; border: none; color: white; padding: 8px 20px;
+            border-radius: 20px; cursor: pointer; font-weight: bold; width: 100%;
         }
         #guide-msg {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
@@ -33,19 +44,24 @@
 
     <div id="ui-container">
         <div id="ui-title">발전소 정보</div>
+        
+        <div class="img-flex-box">
+            <img id="pop-pokemon-img" class="ui-preview-img" src="" alt="포켓몬">
+            <img id="pop-factory-img" class="ui-preview-img" src="" alt="발전소">
+        </div>
+
         <div id="ui-desc">내용</div>
-        <button id="info-btn" onclick="alert('학습을 완료하여 에너지 마스터 도감에 등록되었습니다!')">학습 완료</button>
+        <div class="btn-center">
+            <button id="info-btn" onclick="alert('학습을 완료하여 에너지 마스터 도감에 등록되었습니다!')">학습 완료</button>
+        </div>
     </div>
 
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-        
         <a-assets>
             <img id="pidgeot-pic" src="./pidgeot.png">
             <img id="wind-pic" src="./wind.png">
-            
             <img id="charmander-pic" src="./charmander.png">
             <img id="thermal-pic" src="./thermal.png">
-            
             <img id="squirtle-pic" src="./squirtle.png">
             <img id="hydro-pic" src="./hydro.png">
         </a-assets>
@@ -77,32 +93,42 @@
         const uiTitle = document.querySelector('#ui-title');
         const uiDesc = document.querySelector('#ui-desc');
         const guideMsg = document.querySelector('#guide-msg');
+        
+        // 스크립트로 제어할 팝업창 이미지 태그 가져오기
+        const popPokemonImg = document.querySelector('#pop-pokemon-img');
+        const popFactoryImg = document.querySelector('#pop-factory-img');
 
-        // 1. 풍력 이벤트
+        // 1. 풍력 마커 감지 시
         windMarker.addEventListener('markerFound', () => {
             guideMsg.style.display = 'none';
             uiContainer.style.display = 'block';
             uiTitle.innerText = "🍃 피죤투 × 영덕 풍력 발전소";
             uiDesc.innerText = "거센 바람을 다루는 피죤투처럼, 풍력 발전소는 바람의 대류 현상을 이용해 날개를 회전시켜 무공해 전기를 만듭니다.";
+            // 하단 팝업창 이미지 경로 지정
+            popPokemonImg.src = "./pidgeot.png";
+            popFactoryImg.src = "./wind.png";
         });
 
-        // 2. 화력 이벤트
+        // 2. 화력 마커 감지 시
         thermalMarker.addEventListener('markerFound', () => {
             guideMsg.style.display = 'none';
             uiContainer.style.display = 'block';
             uiTitle.innerText = "🔥 파이리 × 당진 화력 발전소";
             uiDesc.innerText = "파이리의 강력한 불꽃처럼, 화력 발전소는 석탄이나 LNG를 태워 발생한 고압의 증기로 터빈을 돌려 전기를 생산합니다.";
+            popPokemonImg.src = "./charmander.png";
+            popFactoryImg.src = "./thermal.png";
         });
 
-        // 3. 수력 이벤트
+        // 3. 수력 마커 감지 시
         hydroMarker.addEventListener('markerFound', () => {
             guideMsg.style.display = 'none';
             uiContainer.style.display = 'block';
             uiTitle.innerText = "💧 꼬부기 × 소양강 수력 발전소";
             uiDesc.innerText = "시원하게 물을 뿜는 꼬부기처럼, 수력 발전소는 높은 곳에서 떨어지는 물의 힘(위치 에너지)으로 수차를 돌려 전기를 만듭니다.";
+            popPokemonImg.src = "./squirtle.png";
+            popFactoryImg.src = "./hydro.png";
         });
 
-        // 마커가 사라졌을 때 UI 초기화
         const hideUI = () => {
             uiContainer.style.display = 'none';
             guideMsg.style.display = 'block';
