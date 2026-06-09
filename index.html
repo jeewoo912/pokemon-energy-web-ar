@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>에너지 가디언즈 AR 도감</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    
+    <style>
+        /* 모바일 UX를 위한 화면 UI 스타일 선언 */
+        #ui-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            font-family: 'Malgun Gothic', sans-serif;
+            text-align: center;
+            z-index: 9999;
+            display: none; /* 마커 인식 전에는 숨김 */
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+        }
+        #ui-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; color: #ffcb05; }
+        #ui-desc { font-size: 14px; line-height: 1.4; margin-bottom: 10px; }
+        #info-btn {
+            background: #2a75bb; border: none; color: white; padding: 8px 16px;
+            border-radius: 20px; cursor: pointer; font-weight: bold;
+        }
+        #guide-msg {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,255,255,0.9); padding: 8px 15px; border-radius: 20px;
+            font-size: 14px; font-weight: bold; z-index: 9999; border: 2px solid #2a75bb;
+        }
+    </style>
+</head>
+<body style="margin: 0; overflow: hidden;">
+
+    <div id="guide-msg">포켓몬 카드를 카메라로 비춰주세요!</div>
+
+    <div id="ui-container">
+        <div id="ui-title">발전소 정보</div>
+        <div id="ui-desc">내용</div>
+        <button id="info-btn" onclick="alert('퀴즈 미션 완료! 에너지 배지를 획득했습니다!')">학습 완료</button>
+    </div>
+
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
+        
+        <a-assets>
+            <img id="wind-img" src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?q=80&w=300" crossorigin="anonymous">
+            <img id="solar-img" src="https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=300" crossorigin="anonymous">
+        </a-assets>
+
+        <a-marker preset="hiro" id="wind-marker">
+            <a-image src="#wind-img" position="0 0.5 0" rotation="-90 0 0" width="1.5" height="1.5"></a-image>
+            <a-cylinder position="0 0.5 0" radius="0.05" height="1" color="#f5f5f5"></a-cylinder>
+            <a-box position="0 1 0" width="0.2" height="0.2" depth="0.2" color="#cccccc" animation="property: rotation; to: 0 0 360; loop: true; dur: 3000"></a-box>
+        </a-marker>
+
+        <a-marker preset="kanji" id="solar-marker">
+            <a-image src="#solar-img" position="0 0.5 0" rotation="-90 0 0" width="1.5" height="1.5"></a-image>
+            <a-plane position="0 0.6 0" rotation="-60 0 0" width="1" height="0.6" color="#0033aa"></a-plane>
+        </a-marker>
+
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+        // 마커 감지 및 UI 인터랙션 연동 자바스크립트
+        const windMarker = document.querySelector('#wind-marker');
+        const solarMarker = document.querySelector('#solar-marker');
+        const uiContainer = document.querySelector('#ui-container');
+        const uiTitle = document.querySelector('#ui-title');
+        const uiDesc = document.querySelector('#ui-desc');
+        const guideMsg = document.querySelector('#guide-msg');
+
+        // 풍력 마커 인식 시 이벤트
+        windMarker.addEventListener('markerFound', () => {
+            guideMsg.style.display = 'none';
+            uiContainer.style.display = 'block';
+            uiTitle.innerText = "🍃 피죤투와 대관령 풍력 발전소";
+            uiDesc.innerText = "바람의 운동 에너지를 회전력으로 변환하여 청정 전기를 생산합니다. 집에서도 깨끗한 바람의 힘을 체감해 보세요!";
+        });
+
+        // 태양광 마커 인식 시 이벤트
+        solarMarker.addEventListener('markerFound', () => {
+            guideMsg.style.display = 'none';
+            uiContainer.style.display = 'block';
+            uiTitle.innerText = "☀️ 파이리와 해남 태양광 발전소";
+            uiDesc.innerText = "태양의 빛 에너지를 반도체 소자(태양전지)를 통해 직접 전기 에너지로 변환하는 천연 발전 방식입니다.";
+        });
+
+        // 마커가 시야에서 사라졌을 때 처리
+        const hideUI = () => {
+            uiContainer.style.style.display = 'none';
+            guideMsg.style.display = 'block';
+        };
+        windMarker.addEventListener('markerLost', hideUI);
+        solarMarker.addEventListener('markerLost', hideUI);
+    </script>
+</body>
+</html>
